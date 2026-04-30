@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Крокодил</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(104, 119, 255, 0.38), transparent 34%),
+    radial-gradient(circle at 85% 85%, rgba(0, 230, 188, 0.28), transparent 32%),
+    linear-gradient(135deg, #0c1022, #171b34 48%, #080b18);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.app {
+  width: 100%;
+  max-width: 780px;
+  min-height: 560px;
+  padding: 38px;
+  border-radius: 34px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(22px);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.app::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.12),
+    transparent 35%,
+    transparent 70%,
+    rgba(255, 255, 255, 0.08)
+  );
+  pointer-events: none;
+}
+
+.screen {
+  display: none;
+  position: relative;
+  z-index: 1;
+}
+
+.screen.active {
+  display: flex;
+  min-height: 485px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand {
+  font-size: clamp(48px, 9vw, 86px);
+  font-weight: 950;
+  letter-spacing: -0.07em;
+  line-height: 0.95;
+  margin-bottom: 30px;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  padding: 24px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+label {
+  display: block;
+  text-align: left;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+input[type="number"] {
+  width: 100%;
+  margin-top: 8px;
+  padding: 15px 16px;
+  border-radius: 17px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 16px;
+  outline: none;
+}
+
+input[type="number"]:focus {
+  border-color: rgba(155, 237, 255, 0.9);
+  box-shadow: 0 0 0 4px rgba(155, 237, 255, 0.12);
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 16px 28px;
+  font-size: 17px;
+  font-weight: 900;
+  color: #101426;
+  background: linear-gradient(135deg, #ffffff, #bdf7ff);
+  cursor: pointer;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.36);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+#startBtn {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.error {
+  margin-top: 16px;
+  color: #ffd0d0;
+  min-height: 20px;
+  font-size: 14px;
+}
+
+.timer {
+  min-width: 118px;
+  padding: 12px 24px;
+  margin-bottom: 28px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 34px;
+  font-weight: 950;
+  letter-spacing: -0.05em;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.timer.danger {
+  color: #ff4d4d;
+  background: rgba(255, 77, 77, 0.14);
+  border-color: rgba(255, 77, 77, 0.4);
+  transform: scale(1.08);
+}
+
+.wordCard {
+  width: 100%;
+  min-height: 220px;
+  padding: 30px;
+  margin-bottom: 24px;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #101426;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7),
+    0 24px 58px rgba(0, 0, 0, 0.28);
+}
+
+.word {
+  font-size: clamp(36px, 7vw, 76px);
+  font-weight: 950;
+  letter-spacing: -0.06em;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+.bigBtn {
+  min-width: 210px;
+  margin-bottom: 22px;
+}
+
+.score {
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 20px;
+}
+
+.score span {
+  color: white;
+  font-size: 28px;
+  font-weight: 950;
+}
+
+.resultText {
+  max-width: 620px;
+  margin-bottom: 28px;
+  font-size: clamp(32px, 6vw, 58px);
+  font-weight: 950;
+  line-height: 1.08;
+  letter-spacing: -0.06em;
+}
+
+@media (max-width: 560px) {
+  .app {
+    padding: 24px;
+    border-radius: 28px;
+    min-height: 520px;
+  }
+
+  .screen.active {
+    min-height: 460px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .wordCard {
+    min-height: 190px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <section id="setupScreen" class="screen active">
+    <div class="brand">Крокодил</div>
+
+    <div class="card">
+      <label>
+        Секунд в раунде
+        <input id="roundSeconds" type="number" min="5" max="600" step="5" value="60">
+      </label>
+
+      <button id="startBtn" disabled>Начать раунд</button>
+      <div id="error" class="error"></div>
+    </div>
+  </section>
+
+  <section id="gameScreen" class="screen">
+    <div id="timer" class="timer">60</div>
+
+    <div class="wordCard">
+      <div id="currentWord" class="word">—</div>
+    </div>
+
+    <button id="guessedBtn" class="bigBtn">Отгадано!</button>
+
+    <div class="score">Отгадано: <span id="score">0</span></div>
+  </section>
+
+  <section id="resultScreen" class="screen">
+    <div id="resultText" class="resultText">Время вышло. Отгадано за раунд - 0</div>
+    <button id="nextRoundBtn">Следующий раунд</button>
+  </section>
+</div>
+
+<script>
+const setupScreen = document.getElementById("setupScreen");
+const gameScreen = document.getElementById("gameScreen");
+const resultScreen = document.getElementById("resultScreen");
+
+const roundSecondsInput = document.getElementById("roundSeconds");
+const startBtn = document.getElementById("startBtn");
+const guessedBtn = document.getElementById("guessedBtn");
+const nextRoundBtn = document.getElementById("nextRoundBtn");
+
+const error = document.getElementById("error");
+const timerEl = document.getElementById("timer");
+const currentWordEl = document.getElementById("currentWord");
+const scoreEl = document.getElementById("score");
+const resultText = document.getElementById("resultText");
+
+let allWords = [];
+let unusedWords = [];
+let roundSeconds = 60;
+let secondsLeft = 60;
+let score = 0;
+let timerId = null;
+let roundEndTime = null;
+
+loadWords();
+
+async function loadWords() {
+  try {
+    const response = await fetch("words.txt");
+
+    if (!response.ok) {
+      throw new Error("Файл words.txt не найден");
+    }
+
+    const text = await response.text();
+
+    allWords = text
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(Boolean);
+
+    if (allWords.length === 0) {
+      throw new Error("Файл words.txt пустой");
+    }
+
+    unusedWords = shuffle([...allWords]);
+    startBtn.disabled = false;
+    error.textContent = "";
+  } catch (err) {
+    startBtn.disabled = true;
+    error.textContent = "Не удалось загрузить words.txt";
+  }
+}
+
+startBtn.addEventListener("click", () => {
+  const selectedSeconds = Number(roundSecondsInput.value);
+
+  if (!Number.isFinite(selectedSeconds) || selectedSeconds < 5) {
+    error.textContent = "Поставьте длительность раунда минимум 5 секунд.";
+    return;
+  }
+
+  roundSeconds = Math.floor(selectedSeconds);
+  roundSecondsInput.disabled = true;
+
+  startRound();
+});
+
+nextRoundBtn.addEventListener("click", startRound);
+
+guessedBtn.addEventListener("click", () => {
+  score++;
+  scoreEl.textContent = score;
+  showNextWord();
+});
+
+function startRound() {
+  score = 0;
+  secondsLeft = roundSeconds;
+  roundEndTime = Date.now() + roundSeconds * 1000;
+
+  scoreEl.textContent = score;
+  timerEl.classList.remove("danger");
+
+  showScreen(gameScreen);
+  showNextWord();
+  updateTimer();
+
+  clearInterval(timerId);
+
+  timerId = setInterval(() => {
+    updateTimer();
+
+    if (secondsLeft <= 0) {
+      finishRound();
+    }
+  }, 100);
+}
+
+function updateTimer() {
+  const remainingMs = Math.max(0, roundEndTime - Date.now());
+  secondsLeft = remainingMs / 1000;
+
+  if (secondsLeft <= 10) {
+    timerEl.classList.add("danger");
+    timerEl.textContent = secondsLeft.toFixed(1);
+  } else {
+    timerEl.classList.remove("danger");
+    timerEl.textContent = Math.ceil(secondsLeft);
+  }
+}
+
+function finishRound() {
+  clearInterval(timerId);
+  timerId = null;
+
+  timerEl.classList.remove("danger");
+  resultText.textContent = `Время вышло. Отгадано за раунд - ${score}`;
+  showScreen(resultScreen);
+}
+
+function showNextWord() {
+  if (unusedWords.length === 0) {
+    unusedWords = shuffle([...allWords]);
+  }
+
+  const word = unusedWords.pop();
+  currentWordEl.textContent = capitalizeFirstLetter(word);
+}
+
+function capitalizeFirstLetter(text) {
+  if (!text) return text;
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function showScreen(activeScreen) {
+  setupScreen.classList.remove("active");
+  gameScreen.classList.remove("active");
+  resultScreen.classList.remove("active");
+
+  activeScreen.classList.add("active");
+}
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+
+  return array;
+}
+</script>
+</body>
+</html>
